@@ -1,7 +1,7 @@
 import RPi.GPIO as GPIO
 from lights import lights
 import pyrebase
-import automode
+# import automode
 import time
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
@@ -12,9 +12,17 @@ def stream_handler(message):
     # print(message["event"])
     # print(message["path"]) 
     print(message["data"])
-    return (message["data"])
+    checkMode(message["data"])
 
-def Database():
+def checkMode(room_data):
+    autoMode=room_data["mode"]
+    if(autoMode==True):
+        lights(room_data)
+
+
+# Main Function
+def Main():
+    print("RUNNING")
     config = {
         "apiKey": "AIzaSyCgZED8uqNacFRqXcEV7a2jQL2WApeWTu4",
         "authDomain": "coding-faction.firebaseapp.com",
@@ -23,21 +31,8 @@ def Database():
     }
     firebase = pyrebase.initialize_app(config)
     db=firebase.database()
-    # x=db.child("Classes").child("Ground Floor").child("G1").get()
-    # print(x.val())
-    my_stream =db.child("Classes").child("Ground Floor").child("G1").stream(stream_handler)
-    return (my_stream)
-
-# Main Function
-def Main():
+    db.child("Classes").child("Ground Floor").child("G1").stream(stream_handler)
     # Check time 
-
-
-    #check database
-    room_data=Database()
-    autoMode=room_data["mode"]
-    if(autoMode==True):
-        lights(room_data)
 
 # Runs main function
 Main()
